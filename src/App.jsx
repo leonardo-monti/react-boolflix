@@ -16,6 +16,9 @@ export default function App() {
     if (!q) return
     setMovies([])
 
+    let moviesMapped = []
+    let tvMapped = []
+
     axios.get(`${BASE_URL}/search/movie`, {
       params: {
         api_key: API_KEY,
@@ -24,7 +27,7 @@ export default function App() {
       }
     })
       .then((movieRes) => {
-        const movies = movieRes.data.results.map((item) => ({
+        moviesMapped = movieRes.data.results.map((item) => ({
           id: item.id,
           title: item.title,
           originalTitle: item.original_title,
@@ -32,20 +35,17 @@ export default function App() {
           vote: item.vote_average,
           type: "movie",
         }))
-        setMovies(movies)
-      })
-      .catch((err) =>
-        console.error("Errore API", err))
 
-    axios.get(`${BASE_URL}/search/tv`, {
-      params: {
-        api_key: API_KEY,
-        query: q,
-        language: "it-IT",
-      }
-    })
+        return axios.get(`${BASE_URL}/search/tv`, {
+          params: {
+            api_key: API_KEY,
+            query: q,
+            language: "it-IT",
+          }
+        })
+      })
       .then((tvRes) => {
-        const tvSeries = tvRes.data.results.map((item) => ({
+        tvMapped = tvRes.data.results.map((item) => ({
           id: item.id,
           title: item.name,
           originalTitle: item.original_name,
@@ -53,7 +53,7 @@ export default function App() {
           vote: item.vote_average,
           type: "tv",
         }))
-        setMovies((prev) => [...prev, ...tvSeries])
+        setMovies([...moviesMapped, ...tvMapped])
       })
       .catch((err) =>
         console.error("Errore API", err))
