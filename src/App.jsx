@@ -14,6 +14,7 @@ export default function App() {
   const handleSearch = () => {
     const q = query.trim()
     if (!q) return
+    setMovies([])
 
     axios.get(`${BASE_URL}/search/movie`, {
       params: {
@@ -22,13 +23,42 @@ export default function App() {
         language: "it-IT",
       }
     })
-      .then((res) => {
-        setMovies(res.data.results)
+      .then((movieRes) => {
+        const movies = movieRes.data.results.map((item) => ({
+          id: item.id,
+          title: item.title,
+          originalTitle: item.original_title,
+          language: item.original_language,
+          vote: item.vote_average,
+          type: "movie",
+        }))
+        setMovies(movies)
       })
-      .catch((err) => {
-        console.error("Errore API", err)
+      .catch((err) =>
+        console.error("Errore API", err))
+
+    axios.get(`${BASE_URL}/search/tv`, {
+      params: {
+        api_key: API_KEY,
+        query: q,
+        language: "it-IT",
+      }
+    })
+      .then((tvRes) => {
+        const tvSeries = tvRes.data.results.map((item) => ({
+          id: item.id,
+          title: item.name,
+          originalTitle: item.original_name,
+          language: item.original_language,
+          vote: item.vote_average,
+          type: "tv",
+        }))
+        setMovies((prev) => [...prev, ...tvSeries])
       })
+      .catch((err) =>
+        console.error("Errore API", err))
   }
+
 
   const handleQueryChange = (e) => {
     setQuery(e.target.value)
