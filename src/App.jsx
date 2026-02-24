@@ -1,35 +1,51 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import axios from 'axios'
+import SearchBar from './components/SearchBar'
+import MovieList from './components/MovieList'
 
-function App() {
-  const [count, setCount] = useState(0)
+const BASE_URL = "https://api.themoviedb.org/3"
+const API_KEY = import.meta.env.VITE_TMDB_API_KEY
+
+
+export default function App() {
+  const [query, setQuery] = useState("")
+  const [movies, setMovies] = useState([])
+
+  const handleSearch = () => {
+    const q = query.trim()
+    if (!q) return
+
+    axios.get(`${BASE_URL}/search/movie`, {
+      params: {
+        api_key: API_KEY,
+        query: q,
+        language: "it-IT",
+      }
+    })
+      .then((res) => {
+        setMovies(res.data.results)
+      })
+      .catch((err) => {
+        console.error("Errore API", err)
+      })
+  }
+
+  const handleQueryChange = (e) => {
+    setQuery(e.target.value)
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className="container py-4">
+      <h1>BOOLFLIX</h1>
+      <SearchBar
+        query={query}
+        onQueryChange={handleQueryChange}
+        onSearch={handleSearch}
+      />
+      <MovieList movies={movies} />
+    </div>
+
   )
 }
 
-export default App
+
