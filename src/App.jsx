@@ -33,6 +33,7 @@ export default function App() {
           originalTitle: item.original_title,
           language: item.original_language,
           vote: item.vote_average,
+          posterPath: item.poster_path,
           type: "movie",
         }))
 
@@ -51,6 +52,7 @@ export default function App() {
           originalTitle: item.original_name,
           language: item.original_language,
           vote: item.vote_average,
+          posterPath: item.poster_path,
           type: "tv",
         }))
         setMovies([...moviesMapped, ...tvMapped])
